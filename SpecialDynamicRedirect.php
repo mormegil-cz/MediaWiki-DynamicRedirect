@@ -25,16 +25,18 @@ class SpecialDynamicRedirect extends SpecialPage {
 
 		$destination = false;
 
-		switch( $mode ) {
-		case 'parse':
-			$destination = $this->getFromParse( $target );
-			break;
-		case 'catfirst':
-			$destination = $this->getFromCategory( $target, 'ASC' );
-			break;
-		case 'catlast':
-			$destination = $this->getFromCategory( $target, 'DESC' );
-			break;
+		if ( $mode !== '' && $target !== '' ) {
+			switch( $mode ) {
+			case 'parse':
+				$destination = $this->getFromParse( $target );
+				break;
+			case 'catfirst':
+				$destination = $this->getFromCategory( $target, 'ASC' );
+				break;
+			case 'catlast':
+				$destination = $this->getFromCategory( $target, 'DESC' );
+				break;
+			}
 		}
 
 		if ( ! $destination instanceof Title ) {
