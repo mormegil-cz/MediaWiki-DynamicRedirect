@@ -17,7 +17,7 @@ class SpecialDynamicRedirect extends SpecialPage {
 
 	function execute( $par ) {
 		$this->setHeaders();
-		$this->outputHeader(); 
+		$this->outputHeader();
 		$request = $this->getRequest();
 
 		$mode = $request->getText( 'mode' );
@@ -62,7 +62,7 @@ class SpecialDynamicRedirect extends SpecialPage {
 			Html::openElement( 'fieldset' ) .
 			Html::element( 'legend', null, $this->msg( 'dynamicredirect' )->text() ) .
 			Html::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
-			Xml::label( $this->msg( 'dynamicredirect-mode')->text(), 'dynamicredirect-mode' ) . " " .
+			Xml::label( $this->msg( 'dynamicredirect-mode' )->text(), 'dynamicredirect-mode' ) . " " .
 			Html::openElement( 'select', array( 'id' => 'dynamicredirect-mode', 'name' => 'mode' ) ) . "\n" .
 			implode( "\n", $modes ) .
 			Html::closeElement( 'select' ) . "<br />\n" .
@@ -113,7 +113,7 @@ class SpecialDynamicRedirect extends SpecialPage {
 				'category' => array( 'LEFT JOIN', array(
 					'cat_title = page_title',
 					'page_namespace' => NS_CATEGORY
-				))
+				) )
 			)
 		);
 
@@ -127,6 +127,6 @@ class SpecialDynamicRedirect extends SpecialPage {
 	}
 
 	protected function getGroupName() {
-			return 'redirects';
+		return 'redirects';
 	}
 }

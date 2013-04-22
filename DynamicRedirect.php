@@ -16,7 +16,7 @@ require_once( "\$IP/extensions/DynamicRedirect/DynamicRedirect.php" );
 EOT;
 	exit( 1 );
 }
- 
+
 $wgExtensionCredits[ 'specialpage' ][] = array(
 	'path' => __FILE__,
 	'name' => 'DynamicRedirect',
