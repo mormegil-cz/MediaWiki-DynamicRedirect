@@ -18,6 +18,6 @@ $specialPageAliases[ 'en' ] = array(
 /** Czech
  * @author Mormegil
  */
-$specialPageAliases[ 'de' ] = array(
+$specialPageAliases[ 'cs' ] = array(
         'MyExtension' => array( 'DynamickéPřesměrování', 'Dynamické přesměrování', 'DynamickePresmerovani' ),
 );
