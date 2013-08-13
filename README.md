@@ -37,6 +37,15 @@ the user is redirected to a page chosen based on the values of the parameters:
 
 If the parameters are not valid, or there is no target page fulfilling the parameters, Special:DynamicRedirect displays a UI (and possible an error message) showing the possible options.
 
+Transclusion
+------------
+
+A dynamically determined page can also be transcluded to another page. The syntax for this is quite straightforward:
+
+    {{Special:DynamicRedirect| mode=MODE | target=TARGET}}
+
+with `MODE` and `TARGET` same as above.
+
 Feedback
 --------
 

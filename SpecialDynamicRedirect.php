@@ -1,6 +1,6 @@
 <?php
 /**
- * [[Special:DynamicRedirect]] - Provide dynamically determined redirections
+ * [[Special:DynamicRedirect]] – Provide dynamically determined redirections
  *
  * @file
  * @ingroup Extensions
@@ -9,13 +9,15 @@
  * @license GNU General Public Licence 2.0 or later
  */
 
-class SpecialDynamicRedirect extends SpecialPage {
+class SpecialDynamicRedirect extends IncludableSpecialPage {
 
 	function __construct() {
 		parent::__construct( 'DynamicRedirect' );
 	}
 
 	function execute( $par ) {
+		global $wgUser, $wgTitle;
+
 		$this->setHeaders();
 		$this->outputHeader();
 		$request = $this->getRequest();
@@ -36,16 +38,44 @@ class SpecialDynamicRedirect extends SpecialPage {
 			case 'catlast':
 				$destination = $this->getFromCategory( $target, 'DESC' );
 				break;
+			default:
+				$this->showError( 'dynamicredirect-badmode' );
+				break;
+			}
+		} else {
+			if ( $this->including() ) {
+				$this->showError( 'dynamicredirect-badparams' );
 			}
 		}
 
 		if ( ! $destination instanceof Title ) {
-			$this->showForm( $mode, $target );
+			if ( ! $this->including() ) {
+				$this->showForm( $mode, $target );
+			}
 		} else if ( $destination->exists() ) {
-			$this->getOutput()->redirect( $destination->getFullUrl() );
+			if ( $this->including() ) {
+				$myParser = new Parser();
+				$myParserOptions = ParserOptions::newFromUser( $wgUser );
+				$parsed = $myParser->parse( '{{:' . $destination->getPrefixedText() . '}}', $wgTitle, $myParserOptions, true )->getText();
+				$this->getOutput()->addHtml( $parsed );
+			} else {
+				$this->getOutput()->redirect( $destination->getFullUrl() );
+			}
 		} else {
-			$this->getOutput()->addHtml( $this->msg( 'dynamicredirect-nosuchtarget' )->rawParams( htmlspecialchars( $destination->getPrefixedText() ) )->parse() );
-			$this->showForm( $mode, $target );
+			$this->showError( 'dynamicredirect-nosuchtarget', htmlspecialchars( $destination->getPrefixedText() ) );
+			if ( ! $this->including() ) {
+				$this->showForm( $mode, $target );
+			}
+		}
+	}
+
+	private function showError( /* ... */ ) {
+		$args = func_get_args();
+		if ( $this->including() ) {
+			$this->getOutput()->wrapWikiMsg( "<div class='error'>\n$1\n</div>", $args );
+		} else {
+			$msg = array_shift( $args );
+			$this->getOutput()->addWikiMsgArray( $msg, $args );
 		}
 	}
 
@@ -84,7 +114,7 @@ class SpecialDynamicRedirect extends SpecialPage {
 		}
 		$result = Title::newFromText( $parsed );
 		if ( $result == null ) {
-			$this->getOutput()->addHtml( $this->msg( 'dynamicredirect-badtitle' )->rawParams( htmlspecialchars( $parsed ) )->parse() );
+			$this->showError( 'dynamicredirect-badtitle', htmlspecialchars( $parsed ) );
 		}
 		return $result;
 	}
@@ -92,7 +122,7 @@ class SpecialDynamicRedirect extends SpecialPage {
 	private function getFromCategory( $categoryName, $ordering ) {
 		$categoryTitle = Title::makeTitleSafe( NS_CATEGORY, $categoryName );
 		if ( $categoryTitle == null || $categoryTitle->getNamespace() != NS_CATEGORY ) {
-			$this->getOutput()->addHtml( $this->msg( 'dynamicredirect-badtitle' )->rawParams( htmlspecialchars( $categoryName ) )->parse() );
+			$this->showError( 'dynamicredirect-badtitle', htmlspecialchars( $categoryName ) );
 			return false;
 		}
 
@@ -119,7 +149,7 @@ class SpecialDynamicRedirect extends SpecialPage {
 
 		$row = $dbr->fetchObject( $res );
 		if ( $row === false ) {
-			$this->getOutput()->addHtml( $this->msg( 'dynamicredirect-emptycategory' )->rawParams( htmlspecialchars( $categoryName ) )->parse() );
+			$this->showError( 'dynamicredirect-emptycategory', htmlspecialchars( $categoryName ) );
 			return false;
 		}
 
